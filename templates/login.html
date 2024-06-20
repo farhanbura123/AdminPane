@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon"/>
+
+    <title>SB Admin 2 - Login</title>
+
+    <!-- Custom fonts for this template-->
+    <link
+      href="{{ url_for('static', filename='vendor/fontawesome-free/css/all.min.css') }}"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+      rel="stylesheet"
+    />
+
+    <!-- Custom styles for this template-->
+    <link
+      href="{{ url_for('static', filename='sb-admin-2.min.css') }}"
+      rel="stylesheet"
+    />
+
+    <style>
+      .bg-login-image {
+        background-image: url("static/test.jpeg");
+      }
+      .card {
+        border-radius: 3rem;
+      }
+      .custom-text {
+        font-weight: bold;
+        font-size: 1rem; /* Medium size */
+        color: green;
+      }
+      .input1{
+        border-radius: 1rem;
+      }
+      .input2{
+        border-radius: 1rem;
+      }
+    </style>
+  </head>
+  <body class="bg-gradient-success">
+    <div class="container">
+      <!-- Outer Row -->
+      <div class="row justify-content-center align-items-center min-vh-100">
+        <div class="col-xl-10 col-lg-12 col-md-9">
+          <div class="card o-hidden border-0 shadow-lg my-5">
+            <div class="card-body p-0">
+              <!-- Nested Row within Card Body -->
+              <div class="row">
+                <div class="col-lg-6 d-none d-lg-block bg-login-image"></div>
+                <div class="col-lg-6">
+                  <div class="p-5">
+                    <div class="text-center">
+                      <h1 class="h4 text-gray-900 mb-4">
+                        Selamat Datang Di Portal Admin PPDB
+                      </h1>
+                    </div>
+                    <!-- Form -->
+                    <div class="form-group">
+                        <label for="userid">Username</label>
+                        <input type="text" class="input1 form-control" id="userid" name="username" placeholder="Enter your username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="userpw">Password</label>
+                        <input type="password" class="input2 form-control" id="userpw" name="password" placeholder="Enter your password" required>
+                    </div>
+                    <button
+                        onclick="login()"
+                        class="btn btn-success btn-user btn-block"
+                    >
+                        Login
+                    </button>
+                    <br />
+                    <div class="text-left mt-2">
+                        <h5 class="custom-text">Belum Punya Hak Akses?</h5>
+                        <p class="text-muted small">
+                            Silakan hubungi pihak sekolah
+                        </p>
+                    </div>
+                    
+                    <!-- Bootstrap Modal for success login -->
+                    <div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title text-success" id="successModalLabel">Login Sukses!</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body text-muted">
+                                    Mengarahkan ke halaman dashboard.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bootstrap Modal for failed login -->
+                    <div class="modal fade" id="failureModal" tabindex="-1" role="dialog" aria-labelledby="failureModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title danger text-danger" id="failureModalLabel">Login Gagal!</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body text-info">
+                                    Data tidak boleh kosong dan data harus benar.
+                                </div>
+                            </div>
+                        </div>
+                    </div>                    
+                    
+                    <!-- end form -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+
+    <!-- Core plugin JavaScript-->
+
+    <!-- Custom scripts for all pages-->
+    <script src="{{ url_for('static', filename='sb-admin-2.min.js') }}"></script>
+    <script>
+      {% if msg %}
+          alert("{{ msg }}")
+      {% endif %}
+
+      function login() {
+        $.ajax({
+            type:'POST',
+            url: "/api/login",
+            data: {username_give: $('#userid').val(), pw_give: $('#userpw').val()},
+            success: function (response) {
+                if (response['result'] === 'success') {
+                    $.cookie('mytoken', response['token']);
+                    // Show success modal
+                    $('#successModal').modal('show');
+                    // Redirect after 2 seconds
+                    setTimeout(function(){
+                        window.location.href = '/';
+                    }, 2000);
+                } else {
+                    // Show failure modal
+                    $('#failureModal').modal('show');
+                }
+            }
+        });{
+          document.getElementById('userid').value = '';
+          document.getElementById('userpw').value = '';
+      }
+    }
+
+    </script>
+  </body>
+</html>
